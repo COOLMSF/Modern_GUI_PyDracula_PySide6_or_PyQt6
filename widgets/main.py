@@ -17,10 +17,6 @@
 import sys
 import os
 import platform
-import time
-from typing import Optional
-
-import PySide6.QtCore
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -31,35 +27,6 @@ os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
 # SET AS GLOBAL WIDGETS
 # ///////////////////////////////////////////////////////////////
 widgets = None
-
-
-from PySide6.QtWidgets import *
-from PySide6.QtCore import Signal, Slot
-
-class Worker(QThread):
-    finished = Signal()
-    intReady = Signal(int)
-    @Slot()
-    def procCounter(self):
-        # box = QMessageBox()
-        # box.setText("procCounter called")
-        # box.exec()
-        
-        for i in range(1, 10):
-            print("Worker started!")
-            time.sleep(1)
-            self.intReady.emit(i)
-
-        self.finished.emit()
-
-    # @Slot()  # QtCore.Slot
-    # def run(self):
-    #     '''
-    #     Your code goes in this function
-    #     '''
-    #     print("Thread start")
-    #     time.sleep(5)
-    #     print("Thread complete")
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -104,17 +71,6 @@ class MainWindow(QMainWindow):
         widgets.btn_widgets.clicked.connect(self.buttonClick)
         widgets.btn_new.clicked.connect(self.buttonClick)
         widgets.btn_save.clicked.connect(self.buttonClick)
-        
-        self.ui.pushButton.clicked.connect(self.pushButton_clicked)
-        
-        self.obj = Worker()
-        self.thread = QThread()
-        
-        self.obj.moveToThread(self.thread)
-        self.obj.intReady.connect(self.update_ready_ui)
-        self.obj.finished.connect(self.update_finished_ui)
-        self.thread.started.connect(self.obj.procCounter)
-        
 
         # EXTRA LEFT BOX
         def openCloseLeftBox():
@@ -149,17 +105,6 @@ class MainWindow(QMainWindow):
         widgets.stackedWidget.setCurrentWidget(widgets.home)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
-    def update_ready_ui(self, i):
-        # box = QMessageBox()
-        # box.setText("update_readd_ui called" + str(i))
-        # box.exec()
-        self.ui.plainTextEdit.appendPlainText(str(i) + "\n")
-        # app.processEvents()
-        
-    @Slot()
-    def update_finished_ui(self):
-        self.ui.plainTextEdit.appendPlainText("Finished" + "\n")
-        self.thread.quit()
 
     # BUTTONS CLICK
     # Post here your functions for clicked buttons
@@ -192,14 +137,8 @@ class MainWindow(QMainWindow):
 
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
-        
-    def pushButton_clicked(self):
-        box = QMessageBox()
-        self.thread.start()
-        self.thread.stop()
-        box.setText("线程已开启")
-        box.exec()
-        
+
+
     # RESIZE EVENTS
     # ///////////////////////////////////////////////////////////////
     def resizeEvent(self, event):
